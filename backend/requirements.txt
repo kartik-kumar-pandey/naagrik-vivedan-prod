@@ -12,3 +12,4 @@ python-multipart>=0.0.6
 torch>=2.0.0
 torchvision>=0.15.0
 firebase-admin>=6.5.0
+gunicorn>=21.2.0
