@@ -1,0 +1,47 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python virtual environments and environment files
+.venv
+env
+venv3
+venv3.9
+env/bin
+env/include
+env/lib
+env/lib64
+env/pyvenv.cfg
+backend/venv
+backend/.env
+backend/uploads
+backend/serviceAccountKey.json
+serviceAccountKey.json
+frontend/.env
+
+# Build output
+/build
+/.next
+/out
+
