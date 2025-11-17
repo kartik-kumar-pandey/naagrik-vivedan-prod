@@ -22,7 +22,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+from flask_cors import CORS
+
+ALLOWED_ORIGINS = [
+    "https://naagrik-nivedan.vercel.app",
+    "http://localhost:5173",
+]
+
+CORS(
+    app,
+    resources={r"/api/*": {"origins": ALLOWED_ORIGINS}},
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+)
 
 backend_dir = os.path.dirname(os.path.abspath(__file__))
 
