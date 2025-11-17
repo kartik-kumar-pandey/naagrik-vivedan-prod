@@ -22,20 +22,40 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-from flask_cors import CORS
 
 ALLOWED_ORIGINS = [
     "https://naagrik-nivedan.vercel.app",
+    "https://naagrik-vivedan.vercel.app",
     "http://localhost:5173",
 ]
+
+ALLOWED_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+ALLOWED_HEADERS = ["Content-Type", "Authorization"]
 
 CORS(
     app,
     resources={r"/api/*": {"origins": ALLOWED_ORIGINS}},
     supports_credentials=True,
-    allow_headers=["Content-Type", "Authorization"],
-    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=ALLOWED_HEADERS,
+    methods=ALLOWED_METHODS,
 )
+
+
+@app.after_request
+def ensure_cors_headers(response):
+    origin = request.headers.get("Origin")
+    if origin in ALLOWED_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Vary"] = response.headers.get("Vary", "")
+        if "Origin" not in response.headers["Vary"]:
+            response.headers["Vary"] = (response.headers["Vary"] + ", Origin").strip(", ")
+
+    if request.method == "OPTIONS":
+        response.headers["Access-Control-Allow-Methods"] = ", ".join(ALLOWED_METHODS)
+        response.headers["Access-Control-Allow-Headers"] = ", ".join(ALLOWED_HEADERS)
+
+    return response
 
 backend_dir = os.path.dirname(os.path.abspath(__file__))
 
