@@ -168,7 +168,7 @@ const ComplaintDetails = ({ complaint, onClose, onStatusUpdate }) => {
   const departmentName = localComplaint.department || 'Department';
   const trackingId = `${(departmentName || 'Department').replace(/\s+/g, '')}-TICKET-${localComplaint.id}`;
   const submittedDate = formatDate(localComplaint.created_at || localComplaint.createdAt);
-  const citizenName = localComplaint.user_id || localComplaint.userId || 'Concerned Citizen';
+  const citizenName = submitterName || localComplaint.user_id || localComplaint.userId || 'Concerned Citizen';
   const citizenAddress = localComplaint.address || 'Not Provided';
   const complaintDescription = localComplaint.description || 'Not provided';
   const priorityLabel = (localComplaint.priority || 'normal').toUpperCase();
