@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { CITIZEN_DASHBOARD_PATH, DEPARTMENT_DASHBOARD_PATH } from '../constants/routes';
 
 const ProtectedRoute = ({ children, requiredRole = null, requiredDepartment = null }) => {
   const { isAuthenticated, isCitizen, isOfficial, getDepartment, isLoading } = useAuth();
@@ -20,16 +21,17 @@ const ProtectedRoute = ({ children, requiredRole = null, requiredDepartment = nu
 
   // Check role requirements
   if (requiredRole === 'citizen' && !isCitizen()) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={DEPARTMENT_DASHBOARD_PATH} replace />;
   }
 
   if (requiredRole === 'official' && !isOfficial()) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={CITIZEN_DASHBOARD_PATH} replace />;
   }
 
   // Check department requirements
   if (requiredDepartment && getDepartment() !== requiredDepartment) {
-    return <Navigate to="/dashboard" replace />;
+    const fallback = isCitizen() ? CITIZEN_DASHBOARD_PATH : DEPARTMENT_DASHBOARD_PATH;
+    return <Navigate to={fallback} replace />;
   }
 
   return children;

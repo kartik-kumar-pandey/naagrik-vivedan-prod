@@ -228,3 +228,4 @@ class IssueClassifier:
             print(f"Error during classification: {e}")
             raise RuntimeError(f"Classification failed: {e}")
 
+

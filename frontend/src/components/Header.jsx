@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Camera, Search, Home, BarChart3, LogOut, User, Building2 } from 'lucide-react';
 import { gsap } from 'gsap';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { CITIZEN_DASHBOARD_PATH, DEPARTMENT_DASHBOARD_PATH } from '../constants/routes';
 import toast from 'react-hot-toast';
 
 const Header = () => {
@@ -50,14 +51,14 @@ const Header = () => {
   const getNavItems = () => {
     if (isCitizen()) {
       return [
-        { path: '/dashboard', label: 'My Complaints', icon: User },
+        { path: CITIZEN_DASHBOARD_PATH, label: 'My Complaints', icon: User },
         { path: '/', label: 'Home', icon: Home },
         { path: '/report', label: 'Report Issue', icon: Camera },
         { path: '/track', label: 'Track Complaint', icon: Search },
       ];
     } else if (isOfficial()) {
       return [
-        { path: '/dashboard', label: 'Department Dashboard', icon: Building2 },
+        { path: DEPARTMENT_DASHBOARD_PATH, label: 'Department Dashboard', icon: Building2 },
         { path: '/admin-dashboard', label: 'All Complaints', icon: BarChart3 },
       ];
     }

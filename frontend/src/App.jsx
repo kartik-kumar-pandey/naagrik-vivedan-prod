@@ -13,11 +13,12 @@ import ComplaintsDashboard from './pages/ComplaintsDashboard.jsx';
 import DepartmentDashboard from './pages/DepartmentDashboard.jsx';
 import CitizenDashboard from './pages/CitizenDashboard.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import { CITIZEN_DASHBOARD_PATH, DEPARTMENT_DASHBOARD_PATH } from './constants/routes';
 import './App.css';
 
 function AppContent() {
   const [userLocation, setUserLocation] = useState(null);
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isCitizen, isOfficial } = useAuth();
   const mainRef = useRef(null);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -116,7 +117,7 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Home />} />
           <Route 
-            path="/dashboard" 
+            path={CITIZEN_DASHBOARD_PATH} 
             element={
               <ProtectedRoute requiredRole="citizen">
                 <CitizenDashboard />
@@ -148,7 +149,7 @@ function AppContent() {
             } 
           />
           <Route 
-            path="/dashboard" 
+            path={DEPARTMENT_DASHBOARD_PATH} 
             element={
               <ProtectedRoute requiredRole="official">
                 <DepartmentDashboard />
@@ -162,6 +163,10 @@ function AppContent() {
                 <ComplaintsDashboard />
               </ProtectedRoute>
             } 
+          />
+          <Route 
+            path="/dashboard"
+            element={<DashboardRedirect />} 
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -192,3 +197,18 @@ function App() {
 }
 
 export default App;
+
+const DashboardRedirect = () => {
+  const { isAuthenticated, isCitizen } = useAuth();
+
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <Navigate 
+      to={isCitizen() ? CITIZEN_DASHBOARD_PATH : DEPARTMENT_DASHBOARD_PATH} 
+      replace 
+    />
+  );
+};

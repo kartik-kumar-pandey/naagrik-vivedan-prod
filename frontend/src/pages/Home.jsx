@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { CITIZEN_DASHBOARD_PATH } from '../constants/routes';
 import { Camera, Search, MapPin, AlertTriangle, Clock, Users, LogIn } from 'lucide-react';
 import { gsap } from 'gsap';
 import { useAuth } from '../contexts/AuthContext.jsx';
@@ -135,7 +136,7 @@ const Home = () => {
             ) : (
               <>
                 <Link
-                  to="/dashboard"
+                  to={CITIZEN_DASHBOARD_PATH}
                   className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-8 py-4 rounded-xl font-bold hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg shadow-blue-600/50 hover:shadow-xl hover:scale-105"
                 >
                   <Camera className="w-5 h-5" />

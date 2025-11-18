@@ -186,6 +186,9 @@ def get_complaint_or_404(complaint_id):
 
 # API Keys
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+HF_CLASSIFIER_URL = os.getenv('HF_CLASSIFIER_URL', 'https://kartik9737-naagriknivedan.hf.space/predict')
+HF_CLASSIFIER_TOKEN = os.getenv('HF_CLASSIFIER_TOKEN')
+HF_CLASSIFIER_TIMEOUT = int(os.getenv('HF_CLASSIFIER_TIMEOUT', '60'))
 
 # Initialize AI services
 if GEMINI_API_KEY:
@@ -218,42 +221,6 @@ def api_root():
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok'})
-
-# Import the model inference module
-from model_inference import IssueClassifier
-
-# Initialize the classifier with the trained MobileNetV3 model
-# Using the best_urban_mobilenet.pth model from the model directory
-# Get the project root directory (parent of backend)
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-model_path = os.path.join(project_root, 'model', 'best_urban_mobilenet.pth')
-
-# Set num_classes=6 if your model was trained with all 6 categories (including illegal_parking)
-# Set num_classes=5 if your model was trained with only 5 categories (without illegal_parking)
-try:
-    classifier = IssueClassifier(model_path=model_path, num_classes=6)
-    print("=" * 60)
-    print("[OK] Model classifier initialized successfully!")
-    print("=" * 60)
-except FileNotFoundError as e:
-    print("=" * 60)
-    print("[ERROR] Model file not found!")
-    print("=" * 60)
-    print(str(e))
-    print(f"\nExpected model path: {model_path}")
-    print("\nTo fix this:")
-    print("1. Ensure best_urban_mobilenet.pth exists in the model/ directory")
-    print("2. The model should be trained with MobileNetV3CBAM architecture")
-    print("3. Check that the file path is correct")
-    print("=" * 60)
-    raise
-except Exception as e:
-    print("=" * 60)
-    print("[ERROR] Failed to initialize model!")
-    print("=" * 60)
-    print(str(e))
-    print("=" * 60)
-    raise
 
 # Utility Functions
 def get_address_from_coords(lat, lon):
@@ -534,12 +501,42 @@ Complaint ID: {user_id}
     
     return complaint_letter.strip()
 
+
+def call_hf_classifier(image_payload):
+    """
+    Forward a base64 image payload to the Hugging Face classifier Space.
+    """
+    if not HF_CLASSIFIER_URL:
+        raise RuntimeError('HF classifier URL is not configured. Set HF_CLASSIFIER_URL in the environment.')
+
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    if HF_CLASSIFIER_TOKEN:
+        headers['Authorization'] = f'Bearer {HF_CLASSIFIER_TOKEN}'
+
+    try:
+        response = requests.post(
+            HF_CLASSIFIER_URL,
+            json={'image': image_payload},
+            headers=headers,
+            timeout=HF_CLASSIFIER_TIMEOUT
+        )
+    except requests.RequestException as exc:
+        raise RuntimeError(f'Failed to reach HF classifier service: {exc}') from exc
+
+    if response.status_code >= 400:
+        raise RuntimeError(f'Classifier service returned {response.status_code}: {response.text}')
+
+    return response.json()
+
 # API Routes
 @app.route('/api/classify-issue', methods=['POST'])
 def classify_issue():
     try:
         data = request.json
-        image_data = data.get('image') if data else None
+        raw_image_payload = data.get('image') if data else None
+        image_data = raw_image_payload
         mime_hint = None
         
         if not image_data:
@@ -580,11 +577,8 @@ def classify_issue():
                     msg += f' mime={mime_hint}'
                 return jsonify({'error': msg}), 400
         
-        # Convert to numpy array for processing
-        image_array = np.array(image)
-        
-        # Classify the issue
-        result = classifier.classify_issue(image_array)
+        # Forward to Hugging Face classifier
+        result = call_hf_classifier(raw_image_payload)
         
         return jsonify(result)
     

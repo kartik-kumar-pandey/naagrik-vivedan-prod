@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogIn, User, Shield, Building2, Eye, EyeOff, UserPlus } from 'lucide-react';
 import { gsap } from 'gsap';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { CITIZEN_DASHBOARD_PATH, DEPARTMENT_DASHBOARD_PATH } from '../constants/routes';
 import toast from 'react-hot-toast';
 
 const Login = () => {
@@ -49,9 +50,9 @@ const Login = () => {
   useEffect(() => {
     if (isAuthenticated()) {
       if (isCitizen()) {
-        navigate('/dashboard');
+        navigate(CITIZEN_DASHBOARD_PATH);
       } else if (isOfficial()) {
-        navigate('/dashboard');
+        navigate(DEPARTMENT_DASHBOARD_PATH);
       }
     }
   }, [isAuthenticated, isCitizen, isOfficial, navigate]);
@@ -102,9 +103,9 @@ const Login = () => {
           toast.success('Account created successfully!');
           setTimeout(() => {
             if (userType === 'citizen') {
-              navigate('/dashboard');
+              navigate(CITIZEN_DASHBOARD_PATH);
             } else {
-              navigate('/dashboard');
+              navigate(DEPARTMENT_DASHBOARD_PATH);
             }
           }, 500);
         } else {
@@ -118,11 +119,11 @@ const Login = () => {
           toast.success('Signed in successfully!');
           setTimeout(() => {
             if (isCitizen()) {
-              navigate('/dashboard');
+              navigate(CITIZEN_DASHBOARD_PATH);
             } else if (isOfficial()) {
-              navigate('/dashboard');
+              navigate(DEPARTMENT_DASHBOARD_PATH);
             } else {
-              navigate('/dashboard');
+              navigate(CITIZEN_DASHBOARD_PATH);
             }
           }, 500);
         } else {
